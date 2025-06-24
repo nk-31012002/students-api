@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/nk-31012002/student-api/internal/config"
 	"log"
 	"log/slog"
@@ -25,11 +24,11 @@ func main() {
 	})
 	//setup server
 	server := http.Server{
-		Addr:    cfg.Addr,
+		Addr:    cfg.HTTPServer.Addr,
 		Handler: router,
 	}
 
-	fmt.Printf("server started %s", cfg.HTTPServer.Addr)
+	slog.Info("server started %s", slog.String("Address", cfg.HTTPServer.Addr))
 
 	done := make(chan os.Signal)
 
