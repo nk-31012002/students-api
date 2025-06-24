@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/nk-31012002/student-api/internal/config"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -41,4 +44,15 @@ func main() {
 	}()
 
 	<-done
+
+	slog.Info("shutting down server")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		slog.Error("failed to shutdown server", slog.String("error", err.Error()))
+	}
+
+	slog.Info("shut down successfully")
 }
