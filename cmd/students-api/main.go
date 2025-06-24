@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/nk-31012002/student-api/internal/config"
 	"github.com/nk-31012002/student-api/internal/http/handlers/students"
+	"github.com/nk-31012002/student-api/internal/storage/sqlite"
 	"log"
 	"log/slog"
 	"net/http"
@@ -17,6 +18,12 @@ func main() {
 	//load config
 	cfg := config.MustLoad()
 	//setup database
+	_, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
 	//setup router
 	router := http.NewServeMux()
 
