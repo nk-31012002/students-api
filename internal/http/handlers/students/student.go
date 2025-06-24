@@ -3,6 +3,7 @@ package students
 import (
 	"encoding/json"
 	"errors"
+	"github.com/go-playground/validator/v10"
 	"github.com/nk-31012002/student-api/internal/types"
 	"github.com/nk-31012002/student-api/internal/utils/response"
 	"io"
@@ -12,6 +13,7 @@ import (
 
 func New() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("Creating a new student")
 
 		var students types.Student
 
@@ -21,9 +23,17 @@ func New() http.HandlerFunc {
 			return
 		}
 
-		slog.Info("Creating a new student")
+		if err != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
 
-		w.Write([]byte("Welome to the student api"))
+		//request validation
+		if err := validator.New().Struct(students); err != nil {
+			validateErrs := err.(validator.ValidationErrors)
+			response.WriteJson(w, http.StatusBadRequest, response.ValidationError(validateErrs))
+			return
+		}
 
 		response.WriteJson(w, http.StatusCreated, map[string]string{"success": "OK"})
 	}
