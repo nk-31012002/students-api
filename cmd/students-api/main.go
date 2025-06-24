@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/nk-31012002/student-api/internal/config"
+	"github.com/nk-31012002/student-api/internal/http/handlers/students"
 	"log"
 	"log/slog"
 	"net/http"
@@ -19,9 +20,7 @@ func main() {
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welome to the student api"))
-	})
+	router.HandleFunc("POST /api/students", students.New())
 	//setup server
 	server := http.Server{
 		Addr:    cfg.HTTPServer.Addr,
