@@ -5,6 +5,9 @@ import (
 	"github.com/nk-31012002/student-api/internal/config"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -24,9 +27,18 @@ func main() {
 	}
 
 	fmt.Printf("server started %s", cfg.HTTPServer.Addr)
-	err := server.ListenAndServe()
 
-	if err != nil {
-		log.Fatal("failed to start server")
-	}
+	done := make(chan os.Signal)
+
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		err := server.ListenAndServe()
+
+		if err != nil {
+			log.Fatal("failed to start server")
+		}
+	}()
+
+	<-done
 }
